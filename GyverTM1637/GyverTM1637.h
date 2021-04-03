@@ -46,7 +46,8 @@ public:
 	
 	void clear(void);														// очистить дисплей
 	
-	void point(boolean PointFlag);											// вкл / выкл точку (POINT_ON / POINT_OFF)
+	void point(boolean PointFlag);                                          // вкл / выкл все точки (POINT_ON / POINT_OFF)
+	void point(uint8_t BitAddr, boolean PointFlag);                 	// вкл / выкл точку (POINT_ON / POINT_OFF)
 
 	void brightness(uint8_t bright, uint8_t = 0x40, uint8_t = 0xc0);		// яркость 0 - 7	
 	
@@ -64,6 +65,7 @@ public:
 	void twistByte(uint8_t DispData[], int delayms);							// обновить значение скручиванием (массив БАЙТ, задержка в мс)
 	void twistByte(uint8_t bit0, uint8_t bit1, uint8_t bit2, uint8_t bit3, int delayms);	// скрутка посимвольно
 	
+
 private:
 	uint8_t lastData[4];
 	void update();
@@ -77,7 +79,7 @@ private:
 	uint8_t Cmd_SetData;
 	uint8_t Cmd_SetAddr;
 	uint8_t Cmd_DispCtrl;
-	uint8_t PointData;
+	uint8_t PointData[4];
 
 	uint8_t Clkpin;
 	uint8_t Datapin;	
