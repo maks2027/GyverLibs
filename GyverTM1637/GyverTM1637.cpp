@@ -11,6 +11,11 @@ GyverTM1637::GyverTM1637(uint8_t clk, uint8_t dio)
 	Datapin = dio;
 	pinMode(Clkpin, OUTPUT);
 	pinMode(Datapin, OUTPUT);
+	
+	PointData[0] = 0;
+	PointData[1] = 0;
+	PointData[2] = 0;
+	PointData[3] = 0;
 }
 
 uint8_t digToHEX(uint8_t digit) {
@@ -73,7 +78,7 @@ void GyverTM1637::display(uint8_t DispData[])
 		//else 
 		//{
 		lastData[i] = digitHEX[DispData[i]];
-		SegData[i] = digitHEX[DispData[i]] + PointData;
+		SegData[i] = digitHEX[DispData[i]] + PointData[i];
 		//}
 	}
 	sendArray(SegData);
@@ -86,7 +91,7 @@ void GyverTM1637::displayByte(uint8_t DispData[])
 		//else SegData[i] = DispData[i];
 		//{
 		lastData[i] = DispData[i];
-		SegData[i] = DispData[i] + PointData;
+		SegData[i] = DispData[i] + PointData[i];
 		//}	
 	}
 	sendArray(SegData);
@@ -99,7 +104,7 @@ void GyverTM1637::display(uint8_t BitAddr, uint8_t DispData)
 	//else
 	//{  
 	lastData[BitAddr] = digitHEX[DispData];
-	SegData = digitHEX[DispData] + PointData;
+	SegData = digitHEX[DispData] + PointData[BitAddr];
 	//}  
 	sendByte(BitAddr, SegData);
 }
@@ -111,7 +116,7 @@ void GyverTM1637::displayByte(uint8_t BitAddr, uint8_t DispData)
 	//else
 	//{  
 	lastData[BitAddr] = DispData;
-	SegData = DispData + PointData;
+	SegData = DispData + PointData[BitAddr];
 	//}  
 	sendByte(BitAddr, SegData);
 }
@@ -181,8 +186,31 @@ void GyverTM1637::brightness(uint8_t brightness, uint8_t SetData, uint8_t SetAdd
 
 void GyverTM1637::point(boolean PointFlag)
 {
-	if (PointFlag) PointData = 0x80;
-	else PointData = 0;
+	if (PointFlag)
+	{
+		PointData[0] = 0x80;
+		PointData[1] = 0x80;
+		PointData[2] = 0x80;
+		PointData[3] = 0x80;
+	}
+	else 
+	{
+		PointData[0] = 0;
+		PointData[1] = 0;
+		PointData[2] = 0;
+		PointData[3] = 0;
+	}		
+	
+	update();
+}
+
+void GyverTM1637::point(uint8_t BitAddr, boolean PointFlag)
+{
+	if (PointFlag)	
+		PointData[BitAddr] = 0x80;
+	else 
+        PointData[BitAddr] = 0;				
+	
 	update();
 }
 
@@ -220,8 +248,8 @@ void GyverTM1637::displayClockTwist(uint8_t hrs, uint8_t mins, int delayms) {
 
 void GyverTM1637::displayInt(int value) {
 	if (value > 9999 || value < -999) return;
-	boolean negative = false;
-	boolean neg_flag = false;
+	
+	boolean negative = false;	
 	byte digits[4];
 	if (value < 0) negative = true;	
 	value = abs(value);	
